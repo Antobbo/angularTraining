@@ -1,15 +1,26 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import {IProduct} from './product';
 @Component({
   selector: 'pm-products',
   templateUrl: './product-list.component.html'
 })
-export class ProductListComponent{
+export class ProductListComponent implements OnInit{
   pageTitle: string = 'This is the title of the page';
   imageWidth: number = 50;
   imageMargin: number = 2;
   showImage: boolean = false;
-  listFilter: string = 'cart';
-  products: any[] = [
+  _listFilter: string;
+  filteredProducts: IProduct[];
+  get listFilter(): string
+  {
+    return this._listFilter;
+  }
+  set listFilter(value:string)
+  {
+    this._listFilter = value;
+    this.filteredProducts = this.listFilter ? this.performFilter(this.listFilter) : this.products;
+  }
+  products: IProduct[] = [
     {
       "productId": 2,
       "productName": "Garden Cart",
@@ -31,9 +42,24 @@ export class ProductListComponent{
       "imageUrl": "http://openclipart.org/image/300px/svg_to_png/73/rejon_Hammer.png"
     }
   ];
+  constructor()
+  {
+    this.filteredProducts = this.products;
+    this.listFilter = 'cart';
+  }
+  performFilter(filterBy: string): IProduct[]
+  {
+    filterBy = filterBy.toLocaleLowerCase();
+    return this.products.filter((product: IProduct) => product.productName.toLocaleLowerCase().indexOf(filterBy) !== -1);
+  }
 
   toggleImage(): void{
     this.showImage = !this.showImage;
     console.log(this.showImage);
+  }
+
+  ngOnInit(): void
+  {
+    console.log('In OnInit');
   }
 }
